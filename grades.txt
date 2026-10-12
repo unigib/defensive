@@ -1,0 +1,10 @@
+IMPORT REPORT
+Rejected line 2: The mark must be a whole number.
+Rejected line 3: The mark must be between 0 and 100.
+Rejected line 5: The row is blank.
+
+Accepted: 3
+Rejected: 3
+Average: 80.0
+Lowest: 70
+Highest: 90
