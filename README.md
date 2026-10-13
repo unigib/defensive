@@ -2,7 +2,7 @@
   <img src="logo.png" alt="GIB University logo" width="180">
 </p>
 
-<h1 align="center">GIB University</h1>
+<h1 align="center">Gibraltar University</h1>
 
 # Python lab: defensive programming
 
@@ -19,6 +19,7 @@ Python uses `try/except` for exception handling.
 | validation.py | Shared conversion and range checks |
 | cli_lab.py | Command-line version with retry handling |
 | gui_lab.py | Tkinter version with error messages |
+| student_form_skeleton.py | Crash-proof Tkinter starter for a safe data-entry form |
 | grade_import.py | Booking-form exercise with five input-validation tasks |
 
 Keep the four number-entry lab files in the same folder. The booking-form
@@ -92,6 +93,86 @@ Enter a value and click Check.
 - Why does the button use `command=submit`?
 - Why does the error handler use `return`?
 - How do both applications reuse the same validation function?
+
+## Crash-proof Tkinter form skeleton
+
+Use the file `student_form_skeleton.py` as a guided starting point for a
+crash-free Tkinter form. It is designed to help you build a form that handles
+bad input safely instead of raising errors in the middle of the GUI.
+
+Run it with:
+
+```bash
+python student_form_skeleton.py
+```
+
+The skeleton shows a simple student-registration form with fields for name,
+student ID, age and GPA. It is intentionally incomplete: each section includes
+`TODO` markers so you can add the defensive checks in a structured order.
+
+The important pattern is:
+
+- Read the value from each `Entry` widget with `.get().strip()`.
+- Check for empty input before converting it.
+- Wrap conversion such as `int()` and `float()` in a `try/except ValueError`
+  block.
+- Validate ranges using normal `if` checks after conversion succeeds.
+- Use `messagebox.showerror(...)` to report problems and then `return` so the
+  form exits cleanly without crashing.
+- Clear the fields only after a successful submission.
+
+This template demonstrates the defensive-programming pattern that keeps the
+application responsive and prevents uncaught exceptions from stopping the
+Tkinter window.
+
+## Web solution in Flask
+
+The same defensive ideas can be used in a web form built with Flask. Instead of
+reading data from Tkinter `Entry` widgets, the server reads values from
+`request.form`.
+
+A typical Flask version follows the same structure:
+
+```python
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    error = ""
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        age_text = request.form.get('age', '').strip()
+
+        if not name:
+            error = 'Please enter your name.'
+        else:
+            try:
+                age = int(age_text)
+            except ValueError:
+                error = 'Age must be a whole number.'
+            else:
+                if age < 18 or age > 100:
+                    error = 'Age must be between 18 and 100.'
+                else:
+                    return f"Valid submission: {name}, age {age}"
+
+    return render_template('index.html', error=error)
+```
+
+The page template can include a form with fields for name and age, and it can
+show the `error` message when validation fails. The advantage of the Flask
+version is that the browser stays open and the user can correct invalid input
+without restarting the app.
+
+This is the same defensive pattern as the Tkinter starter:
+
+- trim input before validation
+- reject empty values early
+- convert with `try/except`
+- check ranges with `if` statements
+- show a helpful message and stop the action cleanly
 
 ## 5. Test both applications
 
